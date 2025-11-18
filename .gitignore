@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+adv_env/
+venv/
+env/
+
+# Data (CIFAR10)
+data/
+
+# Training outputs
+experiments/
+
+# macOS system files
+.DS_Store
