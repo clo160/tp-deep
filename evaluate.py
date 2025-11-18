@@ -75,7 +75,14 @@ if __name__ == '__main__':
     # Adversarial parameters
     parser.add_argument('--attack', type=str, default='fgsm', help='Attack to perform', choices=['fgsm', 'pgd'])
     parser.add_argument('--epsilon', type=float, default=0.03, help='Epsilon for the attack')   
-    parser.add_argument('--alpha', type=float, default=0.1, help='Alpha for the attack')
+   # parser.add_argument('--alpha', type=float, default=0.1, help='Alpha for the attack')
+    def none_or_float(value):
+        if value == "None":
+            return None
+        return float(value)
+
+    parser.add_argument('--alpha', type=none_or_float, default=None,
+                    help='Alpha step size for PGD (set to None to use eps/T)')
     parser.add_argument('--num_steps', type=int, default=10, help='Number of steps for the attack')
 
 

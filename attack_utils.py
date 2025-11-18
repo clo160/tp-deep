@@ -37,9 +37,7 @@ class FastGradientSignMethod:
         self.model.zero_grad()
 
         # get model output and compute loss (cross-entropy)
-        outputs = self.model(x + delta)
-        loss = nn.CrossEntropyLoss()(outputs, y)
-        #loss = nn.CrossEntropyLoss()(self.model(x + delta), y)
+        loss = nn.CrossEntropyLoss()(self.model(x + delta), y)
         loss.backward()
 
         ## apply one step of sign gradient ascent to the input
@@ -74,6 +72,9 @@ class ProjectedGradientDescent:
         self.model = model
         self.eps = eps
         self.num_iter = num_iter
+        if alpha is None:
+            alpha = eps / num_iter
+            alpha = round(alpha, 4)
 
         ## To do 19
         self.alpha = alpha
@@ -96,12 +97,39 @@ class ProjectedGradientDescent:
 
         # iteratively compute adversarial perturbations
         for t in range(self.num_iter):
-            ## To do 16 
-            break
-
-
-
-            ## Reset the gradients of the model
-            delta.grad.zero_()
+            # on remet à zéro les gradients du modèle
+            self.model.zero_grad()
+            # adversarial input
+            x_adv = x + delta
+            x_adv = torch.clamp(x_adv, 0, 1)
+            # forward + loss
+            outputs = self.model(x_adv)
+            loss = nn.CrossEntropyLoss()(outputs, y)
+            loss.backward()
+            # gradient ascent sur delta
+            grad_sign = delta.grad.detach().sign()
+            delta = delta + self.alpha * grad_sign
+            # projection sur la boule L_inf de rayon eps
+            delta = torch.clamp(delta, -self.eps, self.eps)
+            #projection pour rester dans [0, 1] après ajout à x
+            delta = torch.clamp(x + delta, 0, 1) - x
+            # on prépare le prochain tour
+            delta = delta.detach()
+            delta.requires_grad_()
 
         return delta.detach()
+            ## To do 16 
+            
+"""Avec un budget de perturbation identique ou supérieur, PGD provoque une chute encore plus importante de la performance que FGSM.
+Par exemple, FGSM avec ε = 0.05 réduit l’accuracy à 1.13 %, tandis que PGD avec T = 10 et α = 0.1 mène à une accuracy de 0 %.
+Cela montre que PGD est une attaque itérative plus puissante et capable d’explorer l’espace des perturbations de manière plus agressive, rendant le modèle totalement incorrect.
+Avec un budget de perturbation identique ou supérieur, PGD provoque une chute encore plus importante de la performance que FGSM.
+Par exemple, FGSM avec ε = 0.05 réduit l’accuracy à 1.13 %, tandis que PGD avec T = 10 et α = 0.1 mène à une accuracy de 0 %.
+Cela montre que PGD est une attaque itérative plus puissante et capable d’explorer l’espace des perturbations de manière plus agressive, rendant le modèle totalement incorrect.
+PGD (Projected Gradient Descent) est une attaque itérative qui applique plusieurs mises à jour FGSM successives tout en projetant l’image modifiée dans une boule L∞ de rayon ε. Ces itérations permettent d’explorer plus finement l’espace des perturbations et rendent PGD beaucoup plus efficace que FGSM pour tromper les réseaux de neurones.""
+
+""FGSM = une seule perturbation
+👉 PGD = plusieurs étapes, ajustées, donc attaque plus puissante"""
+            
+
+    
