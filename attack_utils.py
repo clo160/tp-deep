@@ -34,16 +34,22 @@ class FastGradientSignMethod:
         """
         # initialize the perturbation delta to zero, and require gradient for optimization
         delta = torch.zeros_like(x, requires_grad=True)
+        self.model.zero_grad()
 
         # get model output and compute loss (cross-entropy)
-        loss = nn.CrossEntropyLoss()(self.model(x + delta), y)
+        outputs = self.model(x + delta)
+        loss = nn.CrossEntropyLoss()(outputs, y)
+        #loss = nn.CrossEntropyLoss()(self.model(x + delta), y)
         loss.backward()
 
         ## apply one step of sign gradient ascent to the input
+        grad_sign = delta.grad.detach().sign()
+        perturbation = self.eps * grad_sign
+        perturbation = torch.clamp(perturbation, -self.eps, self.eps)
 
         ## To do 12
-        raise NotImplementedError 
-        return perturbation
+        
+        return perturbation.detach()
 
 class ProjectedGradientDescent:
     """
