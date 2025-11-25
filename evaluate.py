@@ -8,7 +8,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader
 from torchvision.datasets import CIFAR10
 
-from models import CNN, ResNet18
+from models import CNN, ResNet18, FC
 from utils import load_model, test_model, visualize_results
 
 from attack_utils import FastGradientSignMethod, ProjectedGradientDescent 
@@ -32,6 +32,8 @@ def main(args):
         model = CNN()
     elif args.model == 'resnet18':
         model = ResNet18()
+    elif args.model == 'fc':
+        model = FC()
 
    # Set the device (cuda, cpu or mps)
     if torch.cuda.is_available():
@@ -68,7 +70,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="""Adversarial attack on Deep Learning models on CIFAR10""")
 
     # Model parameters
-    parser.add_argument('--model', type=str, default='cnn', help='Model to attack', choices=['cnn', 'resnet18'])    
+    #parser.add_argument('--model', type=str, default='cnn', help='Model to attack', choices=['cnn', 'resnet18','fc'])    
+    parser.add_argument('--model', type=str, default='cnn',
+                    help='Model to attack', choices=['cnn', 'resnet18', 'fc'])
     parser.add_argument('--batch_size', type=int, default=512, help='Batch size')
     parser.add_argument('--path', type=str, default='base', help='Path to save the model and results')
 

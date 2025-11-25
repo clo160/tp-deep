@@ -117,5 +117,5 @@ def visualize_results(x, y, model, device, args, attack=None):
     else:
         plt.savefig(os.path.join(args.path, 'examples.png'))
 
-    plt.close()
+plt.close()
     

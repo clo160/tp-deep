@@ -46,8 +46,12 @@ class FastGradientSignMethod:
         perturbation = torch.clamp(perturbation, -self.eps, self.eps)
 
         ## To do 12
+       
         
         return perturbation.detach()
+        
+
+    
 
 class ProjectedGradientDescent:
     """
@@ -129,7 +133,9 @@ Cela montre que PGD est une attaque itérative plus puissante et capable d’exp
 PGD (Projected Gradient Descent) est une attaque itérative qui applique plusieurs mises à jour FGSM successives tout en projetant l’image modifiée dans une boule L∞ de rayon ε. Ces itérations permettent d’explorer plus finement l’espace des perturbations et rendent PGD beaucoup plus efficace que FGSM pour tromper les réseaux de neurones.""
 
 ""FGSM = une seule perturbation
-👉 PGD = plusieurs étapes, ajustées, donc attaque plus puissante"""
+PGD = plusieurs étapes, ajustées, donc attaque plus puissante"""
             
 
     
+# FC tres vulenrable aux attaques adversariales car capture pas bien les structures spatiales dees images, apprend relations simples qui sotn faciles à perturber et les gradients sont plus propres donc faciles a attaquer . accuracy apres pgd 0%
+#Le CNN est plus robuste que le FC, mais reste vulnérable car convolutions extraient des motifs plus stables,présence de pooling crée des non-linéarités plus complexes et gradients sont moins alignés, l’attaque doit travailler plus.Accuracy après PGD > accuracy FC
